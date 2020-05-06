@@ -11,8 +11,8 @@ import os.path, sys
 
 
 
-path = "/home/bmetzler/Documents/Imagery/Accra/preprocessed/tif_cut_file/rgb/"
-out_path = "/home/bmetzler/Documents/Imagery/Accra/preprocessed/kmeans_8_tiles/"
+path = "~/Imagery/Accra/preprocessed/tif_cut_file/rgb/"
+out_path = "~/Imagery/Accra/preprocessed/kmeans_8_tiles/"
 
 
 def multi_pic_kmean(path, out_path, K):
