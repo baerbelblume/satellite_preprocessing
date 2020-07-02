@@ -20,8 +20,7 @@ from sklearn.decomposition import PCA
 
 import matplotlib.pyplot as plt
 
-import numpy as np
-import glob
+
 # get corner coordinates
 def GrabCornerCoordinates(FileName):
     src = gdal.Open(FileName)
