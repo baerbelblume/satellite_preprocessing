@@ -10,12 +10,18 @@ from rasterio.mask import mask
 from rasterio.plot import show
 import os, sys
 import pandas as pd
+import numpy as np
 import geopandas as gpd
 import matplotlib.image as mpimg
+import tifffile as tiff
+
 from sklearn.cluster import KMeans
+from sklearn.decomposition import PCA
 
 import matplotlib.pyplot as plt
 
+import numpy as np
+import glob
 # get corner coordinates
 def GrabCornerCoordinates(FileName):
     src = gdal.Open(FileName)
@@ -125,6 +131,44 @@ def normalize(array):
     array_min, array_max = array.min(), array.max()
     return ((array - array_min)/(array_max - array_min))
 
+
+
+############### PCA
+## folder with multispectral tif files
+
+def pca_multispectral(files, folder, n_bands)
+    for ix, raster_file in enumerate(files):
+        raster = tiff.imread(raster_file)
+        img_shape =  raster.shape
+
+        # specify no of bands in the image
+        n_bands = 8
+        # 3 dimensional dummy array with zeros
+        MB_img = np.zeros((img_shape[0],img_shape[1],n_bands))
+        # Convert 2d band array in 1-d to make them as feature vectors and Standardization
+        MB_matrix = np.zeros((MB_img[:,:,0].size,n_bands))
+
+        #normalize
+        for i in range(n_bands):
+            MB_array = raster[:,:,i].flatten()  # covert 2d to 1d array
+            MB_arrayStd = (MB_array - MB_array.mean())/MB_array.std()
+            MB_matrix[:,i] = MB_arrayStd
+
+        pca = PCA(n_components=8)
+        transformed_data = pca.fit(MB_matrix)
+        X_pc = pca.transform(MB_matrix)
+        X = X_pc.reshape(img_shape)
+
+        tiff.imsave(folder+str(ix)+'.tif', X[:,:,1])
+
+#### example to run PCA
+
+files = glob.glob('~/Imagery/WV2/multi/AMA/ReProj/Clipped_AMA_box/*.tif')
+folder = '~/Imagery/WV2/multi/AMA/ReProj/Clipped_AMA_box/PCA/'
+n_bands = 8
+
+pca_multispectral(files, folder, n_bands)
+
 # create tiles 
 def create_tiles(input_folder, output_folder, tilesize=128, pan=True):
     for ix, file in enumerate(glob.glob(input_folder + '*.tif')):
@@ -161,7 +205,9 @@ def create_tiles(input_folder, output_folder, tilesize=128, pan=True):
 
         print (ix, 'done')
 
+################### Example for clipping tiles
 Proj = '~/accra-maxar-19/'
 Clipped = '~/accra-maxar-19/256/'
 
 create_tiles(Proj, Clipped, tilesize=256, pan=True)
+
